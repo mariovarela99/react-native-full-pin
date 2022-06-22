@@ -1,113 +1,86 @@
 import React, { useEffect, useState } from "react";
-import { Image, Pressable, View } from "react-native";
+import { View } from "react-native";
+import { Buttons } from "./data/buttons";
+import { ButtonsType } from "./data/types";
 import {
   Button,
   ButtonsContainer,
   ButtonText,
   Container,
-  DigitalContainer,
-  DigitalText,
   InputArea,
   InputNumber,
 } from "./styles";
+import { FullPinProps } from "./types/props";
 
-const FullPin = () => {
-  const [pin, setPin] = useState([]);
+const FullPin: React.FC<FullPinProps> = ({ pin, styles }) => {
+  const [code, setCode] = useState([] as number[]);
 
-  const PinStyles = {
-    backgroundColor: "#3aab1d",
-    borderWidth: 1,
-    borderColor: "#3aab1d",
+  const InputWithValueStyles = {
+    backgroundColor: styles?.input?.backgroundColorWithValue || "#3aab1d",
+    borderWidth: styles?.input?.borderWidthWithValue || 1,
+    borderColor: styles?.input?.borderColorWithValue || "#3aab1d",
   };
 
   useEffect(() => {
-    console.log(pin.toString());
-  }, [pin]);
+    pin.onChange(code.toString());
+
+    if (code.length === pin.pinLength) {
+      pin.onCompleted(code.toString());
+    }
+  }, [code]);
 
   const handleAddNumber = (number: number) => {
-    if (pin.length < 4) {
-      setPin([...pin, number]);
+    if (code.length < pin.pinLength) {
+      setCode([...code, number]);
     }
   };
 
   const handleRemoveNumber = () => {
-    if (pin.length > 0) {
-      let newPin = pin;
+    if (code.length > 0) {
+      let newPin = code;
       newPin.pop();
-      setPin([...newPin]);
+      setCode([...newPin]);
     }
   };
 
   const handleSendPin = () => {
-    console.log("Sent");
+    return pin;
   };
 
   return (
     <View>
       <Container>
         <InputArea>
-          <InputNumber
-            style={pin[0] !== null && pin[0] !== undefined && PinStyles}
-          />
-          <InputNumber
-            style={pin[1] !== null && pin[1] !== undefined && PinStyles}
-          />
-          <InputNumber
-            style={pin[2] !== null && pin[2] !== undefined && PinStyles}
-          />
-          <InputNumber
-            style={pin[3] !== null && pin[3] !== undefined && PinStyles}
-          />
+          {Array.from({ length: pin.pinLength }).map((_, index) => (
+            <>
+              <InputNumber
+                {...styles?.input}
+                key={index}
+                style={
+                  code[index] !== null &&
+                  code[index] !== undefined &&
+                  InputWithValueStyles
+                }
+              />
+            </>
+          ))}
         </InputArea>
 
         <ButtonsContainer>
-          <Button onPress={() => handleAddNumber(1)}>
-            <ButtonText>1</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(2)}>
-            <ButtonText>2</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(3)}>
-            <ButtonText>3</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(4)}>
-            <ButtonText>4</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(5)}>
-            <ButtonText>5</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(6)}>
-            <ButtonText>6</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(7)}>
-            <ButtonText>7</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(8)}>
-            <ButtonText>8</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(9)}>
-            <ButtonText>9</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleRemoveNumber()}>
-            <ButtonText> {"<"} </ButtonText>
-          </Button>
-
-          <Button onPress={() => handleAddNumber(0)}>
-            <ButtonText>0</ButtonText>
-          </Button>
-
-          <Button onPress={() => handleSendPin()}>
-            <ButtonText>OK</ButtonText>
-          </Button>
+          {Buttons.map((item: ButtonsType) => (
+            <Button
+              {...styles?.button}
+              onPress={() => {
+                if (item.type === "OK") return handleSendPin();
+                else {
+                  if (item.type === "remove") return handleRemoveNumber();
+                  else return handleAddNumber(item.value);
+                }
+              }}
+            >
+              <ButtonText {...styles?.buttonText}> {item.text} </ButtonText>
+            </Button>
+          ))}
         </ButtonsContainer>
       </Container>
     </View>
