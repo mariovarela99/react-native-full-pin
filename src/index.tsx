@@ -44,7 +44,7 @@ const FullPin: React.FC<FullPinProps> = ({ pin, styles }) => {
   };
 
   const handleSendPin = () => {
-    return pin;
+    pin.okFunction();
   };
 
   return (
@@ -67,9 +67,10 @@ const FullPin: React.FC<FullPinProps> = ({ pin, styles }) => {
         </InputArea>
 
         <ButtonsContainer>
-          {Buttons.map((item: ButtonsType) => (
+          {Buttons.map((item: ButtonsType, index: number) => (
             <Button
               {...styles?.button}
+              key={index}
               onPress={() => {
                 if (item.type === "OK") return handleSendPin();
                 else {

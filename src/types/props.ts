@@ -39,6 +39,7 @@ export interface FullPinProps {
     pinLength: 4 | 6 | 8;
     onChange: (e: string) => void;
     onCompleted: (e: string) => void;
+    okFunction: () => void | undefined;
   };
   styles?: {
     container?: {
